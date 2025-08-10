@@ -1,0 +1,15 @@
+﻿@page
+@model ezNotes.Pages.Notes.NewModel
+@{
+    ViewData["Title"] = "New Note";
+}
+<h1>New Note</h1>
+
+<form method="post">
+    <label>Title</label>
+    <input asp-for="Input.Title" />
+    <label>Content (Markdown)</label>
+    <textarea asp-for="Input.ContentMd" rows="12"></textarea>
+    <button type="submit">Create</button>
+    <a asp-page="Index">Cancel</a>
+</form>

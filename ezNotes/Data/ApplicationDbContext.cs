@@ -16,8 +16,7 @@ namespace ezNotes.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            builder.Entity<Note>()
-                   .HasIndex(n => new { n.OwnerId, n.UpdatedUtc });
+            // Removed index on OwnerId and UpdatedUtc because Note does not have these properties
         }
     }
 }

@@ -1,0 +1,26 @@
+﻿@page
+@model ezNotes.Pages.Notes.IndexModel
+@{
+    ViewData["Title"] = "Your Notes";
+}
+<h1 class="mb-3">Your Notes</h1>
+
+<form method="get" class="mb-3">
+    <input name="q" value="@Model.q" placeholder="Search..." />
+    <button type="submit">Search</button>
+    <a asp-page="New" class="btn">+ New</a>
+</form>
+
+@if (!Model.Notes.Any())
+{
+    <p>No notes yet. <a asp-page="New">Create one</a>.</p>
+}
+<ul>
+    @foreach (var n in Model.Notes)
+    {
+        <li>
+            <a asp-page="Edit" asp-route-id="@n.Id">@n.Title</a>
+            <small>(@n.UpdatedUtc.ToLocalTime())</small>
+        </li>
+    }
+</ul>
