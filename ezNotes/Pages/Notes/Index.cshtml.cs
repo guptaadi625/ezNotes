@@ -1,36 +1,34 @@
 ﻿using ezNotes.Data;
-using Microsoft.AspNetCore.Authorization;
+using ezNotes.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using ezNotes.Data;
-using ezNotes.Models;
-using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc; // where used
+using Markdig; // only in Edit.cshtml.cs
 
-namespace Noted.Pages.Notes
+namespace ezNotes.Pages.Notes
 {
-    [Authorize]
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _db;
         public IndexModel(ApplicationDbContext db) => _db = db;
 
-        public IList<Note> Notes { get; set; } = new List<Note>();
-        public string? q { get; set; }
+        public IList<Note> Items { get; set; } = new List<Note>();
+        public string? Q { get; set; }
 
         public async Task OnGetAsync(string? q)
         {
-            this.q = q;
-            var uid = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var query = _db.Notes.Where(n => n.OwnerId == uid && !n.IsArchived);
+            Q = q;
+            IQueryable<Note> query = _db.Notes;
 
             if (!string.IsNullOrWhiteSpace(q))
             {
-                q = q.Trim();
                 query = query.Where(n => n.Title.Contains(q) || n.ContentMd.Contains(q));
             }
 
-            Notes = await query.OrderByDescending(n => n.UpdatedUtc)
-                               .Take(200).ToListAsync();
+            Items = await query
+                .OrderByDescending(n => n.UpdatedUtc)
+                .Take(500) // sane cap
+                .ToListAsync();
         }
     }
 }

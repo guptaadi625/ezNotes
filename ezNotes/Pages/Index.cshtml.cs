@@ -1,23 +1,13 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-public class IndexModel : PageModel
+namespace ezNotes.Pages
 {
-    public List<Note> Notes { get; set; } = new();
-
-    public void OnGet()
+    public class IndexModel : PageModel
     {
-        // Example: Replace with your data source
-        Notes = new List<Note>
+        public IActionResult OnGet()
         {
-            new Note { Id = 1, Title = "Welcome to Notion Notes", Content = "This is a sample note. Click + New Note to add more!" },
-            new Note { Id = 2, Title = "Second Note", Content = "You can customize this app as you like." }
-        };
+            return RedirectToPage("/Notes/Index");
+        }
     }
-}
-
-public class Note
-{
-    public int Id { get; set; }
-    public string Title { get; set; } = "";
-    public string Content { get; set; } = "";
 }

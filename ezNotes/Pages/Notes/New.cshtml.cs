@@ -1,20 +1,19 @@
 ﻿using ezNotes.Data;
-using Microsoft.AspNetCore.Authorization;
+using ezNotes.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using ezNotes.Data;
-using ezNotes.Models;
-using System.Security.Claims;
+using Microsoft.EntityFrameworkCore; // where used
+using Markdig; // only in Edit.cshtml.cs
 
-namespace Noted.Pages.Notes
+namespace ezNotes.Pages.Notes
 {
-    [Authorize]
     public class NewModel : PageModel
     {
         private readonly ApplicationDbContext _db;
         public NewModel(ApplicationDbContext db) => _db = db;
+        [BindProperty]
+        public ezNotes.Models.Note Input { get; set; } = new ezNotes.Models.Note();
 
-        [BindProperty] public Note Input { get; set; } = new();
 
         public void OnGet() { }
 
@@ -22,14 +21,13 @@ namespace Noted.Pages.Notes
         {
             if (!ModelState.IsValid) return Page();
 
-            var uid = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            Input.OwnerId = uid;
-            Input.CreatedUtc = Input.UpdatedUtc = DateTime.UtcNow;
-            if (string.IsNullOrWhiteSpace(Input.Title)) Input.Title = "Untitled";
+            Input.CreatedUtc = DateTime.UtcNow;
+            Input.UpdatedUtc = DateTime.UtcNow;
 
             _db.Notes.Add(Input);
             await _db.SaveChangesAsync();
-            return RedirectToPage("Edit", new { id = Input.Id });
+
+            return RedirectToPage("./Edit", new { id = Input.Id });
         }
     }
 }

@@ -1,33 +1,47 @@
-﻿@using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
-
+﻿@{
+    var title = ViewData["Title"] as string ?? "ezNotes";
+}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - ezNotes</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/ezNotes.styles.css" asp-append-version="true" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@title - ezNotes</title>
+    <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - ezNotes - <a asp-area="" asp-page="/Privacy">Privacy</a>
+    <header class="topbar">
+        <div class="container flex">
+            <a class="brand" asp-page="/Notes/Index">📝 ezNotes</a>
+            <nav class="nav">
+                <a asp-page="/Notes/Index">Notes</a>
+                <button id="themeToggle" type="button" class="btn btn-ghost" title="Toggle theme">🌗</button>
+            </nav>
         </div>
+    </header>
+
+    <main class="container">
+        @RenderBody()
+    </main>
+
+    <footer class="footer container">
+        <span>ezNotes • made by adi ❤️</span>
     </footer>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        (function () {
+            const k = "ezNotes-theme";
+            const root = document.documentElement;
+            const saved = localStorage.getItem(k);
+            if (saved) root.setAttribute("data-theme", saved);
+            document.getElementById("themeToggle")?.addEventListener("click", () => {
+                const next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+                root.setAttribute("data-theme", next);
+                localStorage.setItem(k, next);
+            });
+        })();
+    </script>
 
-    @await RenderSectionAsync("Scripts", required: false)
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

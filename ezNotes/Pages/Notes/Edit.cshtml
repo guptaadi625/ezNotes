@@ -1,45 +1,47 @@
 ﻿@page "{id:int}"
 @model ezNotes.Pages.Notes.EditModel
 @{
-    ViewData["Title"] = "Edit Note";
+    ViewData["Title"] = "Edit note";
 }
-<h1>Edit Note</h1>
+<h2>Edit note</h2>
 
-@if (TempData["Saved"] is string msg)
-{
-    <p>@msg</p>
-}
-
-<form method="post" asp-page-handler="Save">
+<form method="post">
     <input type="hidden" asp-for="Input.Id" />
-    <label>Title</label>
-    <input asp-for="Input.Title" />
+    <div class="form-row">
+        <label for="Title">Title</label>
+        <input id="Title" class="input" asp-for="Input.Title" />
+    </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start;">
+    <div class="form-row">
+        <label><input type="checkbox" asp-for="Input.IsArchived" /> Archived</label>
+    </div>
+
+    <div class="editor">
         <div>
-            <label>Content (Markdown)</label>
-            <textarea id="md" asp-for="Input.ContentMd" rows="20"></textarea>
+            <label for="md">Markdown</label>
+            <textarea id="md" class="input" asp-for="Input.ContentMd" rows="18" spellcheck="false"></textarea>
         </div>
         <div>
             <label>Preview</label>
-            <div id="preview" style="border:1px solid #ddd;padding:8px;min-height:300px;">
-                @Html.Raw(Model.HtmlPreview)
-            </div>
+            <div id="preview" class="preview">@Html.Raw(Model.HtmlPreview)</div>
         </div>
     </div>
 
-    <div style="margin-top:12px">
-        <button type="submit">Save</button>
-        <button formaction="?handler=Delete" formmethod="post" class="danger" onclick="return confirm('Delete note?')">Delete</button>
-        <a asp-page="Index">Back</a>
+    <div class="form-row actions">
+        <button class="btn btn-primary" type="submit">Save</button>
+        <a class="btn" asp-page="./Index">Back</a>
+        <button class="btn" formaction="?handler=Delete" formmethod="post" onclick="return confirm('Delete this note?');">Delete</button>
     </div>
 </form>
 
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script>
-    const md = document.getElementById('md');
-    const preview = document.getElementById('preview');
-    function render() { preview.innerHTML = marked.parse(md.value); }
-    md.addEventListener('input', debounce(render, 150));
-    function debounce(fn, n){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), n); }; }
-</script>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        const md = document.getElementById('md');
+        const preview = document.getElementById('preview');
+        function render(){ preview.innerHTML = marked.parse(md.value); }
+        md.addEventListener('input', debounce(render, 150));
+        function debounce(fn, n){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), n); }; }
+        render();
+    </script>
+}

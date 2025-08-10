@@ -1,26 +1,37 @@
 ﻿@page
 @model ezNotes.Pages.Notes.IndexModel
 @{
-    ViewData["Title"] = "Your Notes";
+    ViewData["Title"] = "Notes";
 }
-<h1 class="mb-3">Your Notes</h1>
+<section class="actions" style="margin-bottom:1rem">
+    <form method="get" class="actions" asp-page="./Index">
+        <input class="input" type="text" name="q" value="@Model.Q" placeholder="Search title or content…" />
+        <button class="btn" type="submit">Search</button>
+        <a class="btn btn-primary" asp-page="./New">New</a>
+    </form>
+</section>
 
-<form method="get" class="mb-3">
-    <input name="q" value="@Model.q" placeholder="Search..." />
-    <button type="submit">Search</button>
-    <a asp-page="New" class="btn">+ New</a>
-</form>
-
-@if (!Model.Notes.Any())
-{
-    <p>No notes yet. <a asp-page="New">Create one</a>.</p>
-}
-<ul>
-    @foreach (var n in Model.Notes)
+<section class="list">
+    @foreach (var n in Model.Items)
     {
-        <li>
-            <a asp-page="Edit" asp-route-id="@n.Id">@n.Title</a>
-            <small>(@n.UpdatedUtc.ToLocalTime())</small>
-        </li>
+        <article class="card">
+            <div style="display:flex; justify-content:space-between; gap:.75rem; align-items:center;">
+                <div style="min-width:0;">
+                    <h3><a asp-page="./Edit" asp-route-id="@n.Id">@(!string.IsNullOrWhiteSpace(n.Title) ? n.Title : "(Untitled)")</a></h3>
+                    <p class="badge">
+                        Updated @n.UpdatedUtc.ToLocalTime().ToString("g")
+                        @if (n.IsArchived)
+                        {
+                            <span>• Archived</span>
+                        }
+                    </p>
+                </div>
+                <a class="btn" asp-page="./Edit" asp-route-id="@n.Id">Open</a>
+            </div>
+        </article>
     }
-</ul>
+    @if (!Model.Items.Any())
+    {
+        <p class="muted">No notes yet. Create your first one!</p>
+    }
+</section>

@@ -1,22 +1,18 @@
-﻿// File: Data/ApplicationDbContext.cs
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using ezNotes.Models;            // <-- REQUIRED
 using Microsoft.EntityFrameworkCore;
-using ezNotes.Models; // <-- must match the namespace above
 
 namespace ezNotes.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
-        // If VS keeps picking the wrong Note type, fully-qualify it:
-        // public DbSet<ezNotes.Models.Note> Notes => Set<ezNotes.Models.Note>();
         public DbSet<Note> Notes => Set<Note>();
 
-        protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder b)
         {
-            base.OnModelCreating(builder);
-            // Removed index on OwnerId and UpdatedUtc because Note does not have these properties
+            base.OnModelCreating(b);
+            b.Entity<Note>().HasIndex(n => n.UpdatedUtc);
         }
     }
 }

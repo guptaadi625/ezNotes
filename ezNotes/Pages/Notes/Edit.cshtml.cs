@@ -1,60 +1,60 @@
 ﻿using ezNotes.Data;
+using ezNotes.Models;
 using Markdig;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using ezNotes.Data;
-using ezNotes.Models;
-using System.Security.Claims;
+// only in Edit.cshtml.cs
 
-namespace Noted.Pages.Notes
+
+namespace ezNotes.Pages.Notes
 {
-    [Authorize]
     public class EditModel : PageModel
     {
         private readonly ApplicationDbContext _db;
         public EditModel(ApplicationDbContext db) => _db = db;
 
-        [BindProperty] public Note Input { get; set; } = default!;
+        [BindProperty]
+        public Note Input { get; set; } = default!;
+
         public string HtmlPreview { get; set; } = "";
 
         public async Task<IActionResult> OnGetAsync(int id)
         {
-            var uid = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var note = await _db.Notes.FirstOrDefaultAsync(n => n.Id == id && n.OwnerId == uid);
-            if (note is null) return NotFound();
+            var note = await _db.Notes.FirstOrDefaultAsync(n => n.Id == id);
+            if (note == null) return RedirectToPage("./Index");
 
             Input = note;
             HtmlPreview = Markdown.ToHtml(Input.ContentMd ?? "");
             return Page();
         }
 
-        public async Task<IActionResult> OnPostSaveAsync()
+        public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid) return Page();
-            var uid = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var note = await _db.Notes.FirstOrDefaultAsync(n => n.Id == Input.Id && n.OwnerId == uid);
-            if (note is null) return NotFound();
 
-            note.Title = Input.Title ?? "Untitled";
-            note.ContentMd = Input.ContentMd ?? "";
-            note.UpdatedUtc = DateTime.UtcNow;
+            var existing = await _db.Notes.FirstOrDefaultAsync(n => n.Id == Input.Id);
+
+            if (existing == null) return RedirectToPage("./Index");
+
+            existing.Title = Input.Title ?? "";
+            existing.ContentMd = Input.ContentMd ?? "";
+            existing.IsArchived = Input.IsArchived;
+            existing.UpdatedUtc = DateTime.UtcNow;
+
             await _db.SaveChangesAsync();
-
-            TempData["Saved"] = "Saved.";
-            return RedirectToPage(new { id = note.Id });
+            return RedirectToPage("./Edit", new { id = existing.Id });
         }
 
         public async Task<IActionResult> OnPostDeleteAsync(int id)
         {
-            var uid = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var note = await _db.Notes.FirstOrDefaultAsync(n => n.Id == id && n.OwnerId == uid);
-            if (note is null) return NotFound();
-
-            _db.Notes.Remove(note);
-            await _db.SaveChangesAsync();
-            return RedirectToPage("Index");
+            var note = await _db.Notes.FindAsync(id);
+            if (note != null)
+            {
+                _db.Notes.Remove(note);
+                await _db.SaveChangesAsync();
+            }
+            return RedirectToPage("./Index");
         }
     }
 }
