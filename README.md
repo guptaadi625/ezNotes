@@ -69,3 +69,7 @@ Type Markdown in the left pane – see the preview update live on the right.
 Use the search box on the Notes page to filter notes.
 
 Toggle light/dark mode using the 🌗 button.
+
+--- 
+MIT License © 2025 Aditya Kumar Gupta
+
